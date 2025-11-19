@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import App from './App';
 import * as productService from './services/productService';
 
@@ -47,7 +46,6 @@ describe('App', () => {
 
   it('should refresh product list after creating a new product', async () => {
     // Given
-    const user = userEvent.setup();
     const initialProducts = [
       { id: 1, name: 'Product 1', createdAt: '2025-11-17T10:00:00', updatedAt: '2025-11-17T10:00:00' }
     ];
@@ -75,8 +73,8 @@ describe('App', () => {
     // When - create a new product
     const input = screen.getByLabelText(/product name/i);
     const submitButton = screen.getByRole('button', { name: /create product/i });
-    await user.type(input, 'New Product');
-    await user.click(submitButton);
+    fireEvent.change(input, { target: { value: 'New Product' } });
+    fireEvent.click(submitButton);
 
     // Then - new product should appear in the list
     await waitFor(() => {

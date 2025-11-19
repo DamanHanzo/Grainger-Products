@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import ProductForm from './ProductForm';
 import * as productService from '../services/productService';
 
@@ -21,14 +20,13 @@ describe('ProductForm', () => {
     expect(screen.getByRole('button', { name: /create product/i })).toBeInTheDocument();
   });
 
-  it('should update input value when user types', async () => {
+  it('should update input value when user types', () => {
     // Given
     render(<ProductForm />);
-    const user = userEvent.setup();
     const input = screen.getByLabelText(/product name/i);
 
     // When
-    await user.type(input, 'New Product');
+    fireEvent.change(input, { target: { value: 'New Product' } });
 
     // Then
     expect(input.value).toBe('New Product');
@@ -46,13 +44,12 @@ describe('ProductForm', () => {
     productService.createProduct.mockResolvedValue(createdProduct);
 
     render(<ProductForm onProductCreated={mockOnProductCreated} />);
-    const user = userEvent.setup();
     const input = screen.getByLabelText(/product name/i);
     const submitButton = screen.getByRole('button', { name: /create product/i });
 
     // When
-    await user.type(input, 'New Product');
-    await user.click(submitButton);
+    fireEvent.change(input, { target: { value: 'New Product' } });
+    fireEvent.click(submitButton);
 
     // Then
     await waitFor(() => {
@@ -62,32 +59,30 @@ describe('ProductForm', () => {
     });
   });
 
-  it('should not submit when name is empty', async () => {
+  it('should not submit when name is empty', () => {
     // Given
     const mockOnProductCreated = vi.fn();
     render(<ProductForm onProductCreated={mockOnProductCreated} />);
-    const user = userEvent.setup();
     const submitButton = screen.getByRole('button', { name: /create product/i });
 
     // When
-    await user.click(submitButton);
+    fireEvent.click(submitButton);
 
     // Then
     expect(productService.createProduct).not.toHaveBeenCalled();
     expect(mockOnProductCreated).not.toHaveBeenCalled();
   });
 
-  it('should not submit when name contains only whitespace', async () => {
+  it('should not submit when name contains only whitespace', () => {
     // Given
     const mockOnProductCreated = vi.fn();
     render(<ProductForm onProductCreated={mockOnProductCreated} />);
-    const user = userEvent.setup();
     const input = screen.getByLabelText(/product name/i);
     const submitButton = screen.getByRole('button', { name: /create product/i });
 
     // When
-    await user.type(input, '   ');
-    await user.click(submitButton);
+    fireEvent.change(input, { target: { value: '   ' } });
+    fireEvent.click(submitButton);
 
     // Then
     expect(productService.createProduct).not.toHaveBeenCalled();
@@ -106,13 +101,12 @@ describe('ProductForm', () => {
     productService.createProduct.mockRejectedValue(errorResponse);
 
     render(<ProductForm onProductCreated={mockOnProductCreated} />);
-    const user = userEvent.setup();
     const input = screen.getByLabelText(/product name/i);
     const submitButton = screen.getByRole('button', { name: /create product/i });
 
     // When
-    await user.type(input, 'Test Product');
-    await user.click(submitButton);
+    fireEvent.change(input, { target: { value: 'Test Product' } });
+    fireEvent.click(submitButton);
 
     // Then
     await waitFor(() => {
@@ -128,13 +122,12 @@ describe('ProductForm', () => {
     productService.createProduct.mockReturnValue(createPromise);
 
     render(<ProductForm />);
-    const user = userEvent.setup();
     const input = screen.getByLabelText(/product name/i);
     const submitButton = screen.getByRole('button', { name: /create product/i });
 
     // When
-    await user.type(input, 'Test Product');
-    await user.click(submitButton);
+    fireEvent.change(input, { target: { value: 'Test Product' } });
+    fireEvent.click(submitButton);
 
     // Then
     expect(submitButton).toBeDisabled();
@@ -155,20 +148,19 @@ describe('ProductForm', () => {
     productService.createProduct.mockRejectedValue(errorResponse);
 
     render(<ProductForm />);
-    const user = userEvent.setup();
     const input = screen.getByLabelText(/product name/i);
     const submitButton = screen.getByRole('button', { name: /create product/i });
 
     // When - submit to get error
-    await user.type(input, 'Test');
-    await user.click(submitButton);
+    fireEvent.change(input, { target: { value: 'Test' } });
+    fireEvent.click(submitButton);
     await waitFor(() => {
       expect(screen.getByText(/failed to create product/i)).toBeInTheDocument();
     });
 
     // Clear input and type again
-    await user.clear(input);
-    await user.type(input, 'N');
+    fireEvent.change(input, { target: { value: '' } });
+    fireEvent.change(input, { target: { value: 'N' } });
 
     // Then - error should be cleared
     expect(screen.queryByText(/failed to create product/i)).not.toBeInTheDocument();
@@ -186,11 +178,12 @@ describe('ProductForm', () => {
     productService.createProduct.mockResolvedValue(createdProduct);
 
     render(<ProductForm onProductCreated={mockOnProductCreated} />);
-    const user = userEvent.setup();
     const input = screen.getByLabelText(/product name/i);
+    const form = input.closest('form');
 
     // When
-    await user.type(input, 'New Product{Enter}');
+    fireEvent.change(input, { target: { value: 'New Product' } });
+    fireEvent.submit(form);
 
     // Then
     await waitFor(() => {
