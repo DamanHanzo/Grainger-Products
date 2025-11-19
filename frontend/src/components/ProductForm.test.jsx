@@ -23,8 +23,8 @@ describe('ProductForm', () => {
 
   it('should update input value when user types', async () => {
     // Given
-    const user = userEvent.setup();
     render(<ProductForm />);
+    const user = userEvent.setup();
     const input = screen.getByLabelText(/product name/i);
 
     // When
@@ -36,7 +36,6 @@ describe('ProductForm', () => {
 
   it('should call createProduct and clear form on successful submission', async () => {
     // Given
-    const user = userEvent.setup();
     const mockOnProductCreated = vi.fn();
     const createdProduct = {
       id: 1,
@@ -47,6 +46,7 @@ describe('ProductForm', () => {
     productService.createProduct.mockResolvedValue(createdProduct);
 
     render(<ProductForm onProductCreated={mockOnProductCreated} />);
+    const user = userEvent.setup();
     const input = screen.getByLabelText(/product name/i);
     const submitButton = screen.getByRole('button', { name: /create product/i });
 
@@ -64,9 +64,9 @@ describe('ProductForm', () => {
 
   it('should not submit when name is empty', async () => {
     // Given
-    const user = userEvent.setup();
     const mockOnProductCreated = vi.fn();
     render(<ProductForm onProductCreated={mockOnProductCreated} />);
+    const user = userEvent.setup();
     const submitButton = screen.getByRole('button', { name: /create product/i });
 
     // When
@@ -79,9 +79,9 @@ describe('ProductForm', () => {
 
   it('should not submit when name contains only whitespace', async () => {
     // Given
-    const user = userEvent.setup();
     const mockOnProductCreated = vi.fn();
     render(<ProductForm onProductCreated={mockOnProductCreated} />);
+    const user = userEvent.setup();
     const input = screen.getByLabelText(/product name/i);
     const submitButton = screen.getByRole('button', { name: /create product/i });
 
@@ -96,7 +96,6 @@ describe('ProductForm', () => {
 
   it('should display error message when API call fails', async () => {
     // Given
-    const user = userEvent.setup();
     const mockOnProductCreated = vi.fn();
     const errorResponse = {
       response: {
@@ -107,6 +106,7 @@ describe('ProductForm', () => {
     productService.createProduct.mockRejectedValue(errorResponse);
 
     render(<ProductForm onProductCreated={mockOnProductCreated} />);
+    const user = userEvent.setup();
     const input = screen.getByLabelText(/product name/i);
     const submitButton = screen.getByRole('button', { name: /create product/i });
 
@@ -123,12 +123,12 @@ describe('ProductForm', () => {
 
   it('should disable submit button while submitting', async () => {
     // Given
-    const user = userEvent.setup();
     let resolveCreate;
     const createPromise = new Promise(resolve => { resolveCreate = resolve; });
     productService.createProduct.mockReturnValue(createPromise);
 
     render(<ProductForm />);
+    const user = userEvent.setup();
     const input = screen.getByLabelText(/product name/i);
     const submitButton = screen.getByRole('button', { name: /create product/i });
 
@@ -146,7 +146,6 @@ describe('ProductForm', () => {
 
   it('should clear error message when user starts typing', async () => {
     // Given
-    const user = userEvent.setup();
     const errorResponse = {
       response: {
         status: 500,
@@ -156,6 +155,7 @@ describe('ProductForm', () => {
     productService.createProduct.mockRejectedValue(errorResponse);
 
     render(<ProductForm />);
+    const user = userEvent.setup();
     const input = screen.getByLabelText(/product name/i);
     const submitButton = screen.getByRole('button', { name: /create product/i });
 
@@ -176,7 +176,6 @@ describe('ProductForm', () => {
 
   it('should handle form submission via Enter key', async () => {
     // Given
-    const user = userEvent.setup();
     const mockOnProductCreated = vi.fn();
     const createdProduct = {
       id: 1,
@@ -187,6 +186,7 @@ describe('ProductForm', () => {
     productService.createProduct.mockResolvedValue(createdProduct);
 
     render(<ProductForm onProductCreated={mockOnProductCreated} />);
+    const user = userEvent.setup();
     const input = screen.getByLabelText(/product name/i);
 
     // When
